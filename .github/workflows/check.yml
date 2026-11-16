@@ -1,0 +1,25 @@
+name: check
+
+# Builds the repositories with a throwaway key and installs trk from them
+# with apt (Debian) and dnf (Fedora).
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - run: scripts/test.sh
+        env:
+          GH_TOKEN: ${{ github.token }}

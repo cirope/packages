@@ -1,0 +1,53 @@
+name: publish
+
+# Rebuilds the apt and dnf repositories from the latest trk release and
+# publishes them on GitHub Pages (https://cirope.github.io/packages).
+# trk-cli's release workflow starts it; it can also be run by hand.
+
+on:
+  repository_dispatch:
+    types: [release]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write    # deploy the site
+  id-token: write # prove the deploy comes from this workflow
+
+# One publish at a time; a newer one wins.
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq -y apt-utils createrepo-c rpm
+      - name: Packages from the latest trk release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download --repo cirope/trk-cli --dir "$RUNNER_TEMP/pkgs" \
+            --pattern 'trk_linux_*.deb' --pattern 'trk_linux_*.rpm'
+      - name: Build
+        env:
+          SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
+        run: |
+          printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
+          KEY=$(gpg --list-secret-keys --with-colons | awk -F: '$1 == "fpr" { print $10; exit }')
+          KEY=$KEY scripts/build.sh "$RUNNER_TEMP/pkgs" site https://cirope.github.io/packages
+          cp README.md site/
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v5

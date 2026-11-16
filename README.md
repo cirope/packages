@@ -1,8 +1,8 @@
 # Hullop packages
 
-Hullop's apt and dnf repositories, so your system's usual upgrade keeps
-our tools up to date. Today they serve [Trk](https://github.com/cirope/trk-cli)'s
-command-line client, `trk`, for amd64 and arm64.
+Install [Trk](https://github.com/cirope/trk-cli)'s command-line client,
+`trk`, on Linux, and get every new release with your usual system upgrade.
+For amd64 and arm64.
 
 ## Debian, Ubuntu and derivatives
 
@@ -12,7 +12,7 @@ echo "deb [signed-by=/usr/share/keyrings/hullop.gpg] https://cirope.github.io/pa
 sudo apt update && sudo apt install trk
 ```
 
-`sudo apt update && sudo apt upgrade` brings each new release.
+Upgrade with `sudo apt update && sudo apt upgrade`.
 
 ## Fedora, RHEL, CentOS Stream
 
@@ -21,19 +21,32 @@ sudo curl -fsSLo /etc/yum.repos.d/hullop.repo https://cirope.github.io/packages/
 sudo dnf install trk
 ```
 
-`sudo dnf upgrade` brings each new release. On openSUSE, add the same file
-with `sudo zypper addrepo https://cirope.github.io/packages/rpm/hullop.repo`
-and `sudo zypper install trk`.
+Upgrade with `sudo dnf upgrade`.
 
-## How it works
+## openSUSE
 
-Every package and the repository metadata are signed with Hullop's key
-(`hullop.asc`, `hullop.gpg`). When trk-cli publishes a release, its
-workflow starts [publish](.github/workflows/publish.yml), which downloads
-the release's packages, builds the repositories with
-[scripts/build.sh](scripts/build.sh) and deploys them to GitHub Pages.
-Only the newest release is served.
+```sh
+sudo zypper addrepo https://cirope.github.io/packages/rpm/hullop.repo
+sudo zypper install trk
+```
 
-[scripts/test.sh](scripts/test.sh) (Docker and `gh`) builds them with a
-throwaway key and installs trk from them with apt and dnf; the
-[check](.github/workflows/check.yml) workflow runs it on every push.
+Upgrade with `sudo zypper update`.
+
+## Uninstall
+
+Remove the package (`sudo apt remove trk`, `sudo dnf remove trk` or
+`sudo zypper remove trk`), and the repository with it:
+
+```sh
+# Debian, Ubuntu
+sudo rm /etc/apt/sources.list.d/hullop.list /usr/share/keyrings/hullop.gpg
+
+# Fedora, RHEL, CentOS Stream
+sudo rm /etc/yum.repos.d/hullop.repo
+
+# openSUSE
+sudo zypper removerepo hullop
+```
+
+Packages and repositories are signed with Hullop's key, fingerprint
+`E2F1 BC77 A550 7DB7 5EFD F801 071E 1CE9 44FA B450`.

@@ -24,12 +24,14 @@ docker network create "$net" >/dev/null
 url=http://$net-site:8000
 
 echo "== build"
-docker run --rm -e DEBIAN_FRONTEND=noninteractive -v "$root/scripts:/scripts:ro" -v "$work:/work" ubuntu:24.04 bash -euc '
+docker run --rm -e DEBIAN_FRONTEND=noninteractive -e OWNER="$(id -u):$(id -g)" -v "$root/scripts:/scripts:ro" -v "$work:/work" ubuntu:24.04 bash -euc '
 	apt-get update -qq >/dev/null
 	apt-get install -qq -y apt-utils createrepo-c rpm gpg >/dev/null
 	export GNUPGHOME=$(mktemp -d)
 	gpg --batch --quiet --passphrase "" --quick-gen-key "Hullop test <test@example.com>" rsa4096 sign never
 	KEY=test@example.com /scripts/build.sh /work/pkgs /work/site '"$url"'
+	# Root in here; hand the site back so the cleanup can remove it.
+	chown -R "$OWNER" /work/site
 	chmod -R a+rX /work/site
 '
 

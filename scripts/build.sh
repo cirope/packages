@@ -73,3 +73,15 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey=$url/hullop.asc
 EOF
+
+# People who open the site, or a repository's folder, in a browser get the
+# install instructions.
+for dir in "$site" "$site/apt" "$site/rpm"; do
+	cat >"$dir/index.html" <<'HTML'
+<!doctype html>
+<meta charset="utf-8">
+<title>Hullop packages</title>
+<meta http-equiv="refresh" content="0; url=https://github.com/cirope/packages#readme">
+<p>Install instructions: <a href="https://github.com/cirope/packages#readme">github.com/cirope/packages</a>.</p>
+HTML
+done

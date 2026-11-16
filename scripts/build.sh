@@ -36,6 +36,14 @@ site=$(cd "$site" && pwd)
 gpg --batch --export --armor "$KEY" >"$site/hullop.asc"
 gpg --batch --export "$KEY" >"$site/hullop.gpg"
 
+# Each product's install script, pointed at this site.
+root=$(cd "$(dirname "$0")/.." && pwd)
+for script in "$root"/*/install.sh; do
+	product=$(basename "$(dirname "$script")")
+	mkdir -p "$site/$product"
+	sed "s|@URL@|$url|g" "$script" >"$site/$product/install.sh"
+done
+
 # apt: one suite, "stable", one component, "main".
 cp "${debs[@]}" "$site/apt/pool/"
 (

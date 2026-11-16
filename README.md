@@ -4,11 +4,20 @@ Install [Trk](https://github.com/cirope/trk-cli)'s command-line client,
 `trk`, on Linux, and get every new release with your usual system upgrade.
 For amd64 and arm64.
 
+```sh
+curl -fsSL https://packages.hullop.com/trk/install.sh | sh
+```
+
+The script adds the repository below that fits your distribution and
+installs trk from it. On Alpine and other distributions it installs the
+package or the binary from the latest release, checked against its
+checksums; on macOS it uses Homebrew. To set things up by hand instead:
+
 ## Debian, Ubuntu and derivatives
 
 ```sh
-curl -fsSL https://cirope.github.io/packages/hullop.gpg | sudo tee /usr/share/keyrings/hullop.gpg >/dev/null
-echo "deb [signed-by=/usr/share/keyrings/hullop.gpg] https://cirope.github.io/packages/apt stable main" | sudo tee /etc/apt/sources.list.d/hullop.list
+curl -fsSL https://packages.hullop.com/hullop.gpg | sudo tee /usr/share/keyrings/hullop.gpg >/dev/null
+echo "deb [signed-by=/usr/share/keyrings/hullop.gpg] https://packages.hullop.com/apt stable main" | sudo tee /etc/apt/sources.list.d/hullop.list
 sudo apt update && sudo apt install trk
 ```
 
@@ -17,7 +26,7 @@ Upgrade with `sudo apt update && sudo apt upgrade`.
 ## Fedora, RHEL, CentOS Stream
 
 ```sh
-sudo curl -fsSLo /etc/yum.repos.d/hullop.repo https://cirope.github.io/packages/rpm/hullop.repo
+sudo curl -fsSLo /etc/yum.repos.d/hullop.repo https://packages.hullop.com/rpm/hullop.repo
 sudo dnf install trk
 ```
 
@@ -26,7 +35,7 @@ Upgrade with `sudo dnf upgrade`.
 ## openSUSE
 
 ```sh
-sudo zypper addrepo https://cirope.github.io/packages/rpm/hullop.repo
+sudo zypper addrepo https://packages.hullop.com/rpm/hullop.repo
 sudo zypper install trk
 ```
 

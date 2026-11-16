@@ -1,7 +1,7 @@
 name: publish
 
 # Rebuilds the apt and dnf repositories from the latest trk release and
-# publishes them on GitHub Pages (https://cirope.github.io/packages).
+# publishes them on GitHub Pages (https://packages.hullop.com).
 # trk-cli's release workflow starts it, and so does a push to master; it
 # can also be run by hand.
 
@@ -47,7 +47,7 @@ jobs:
         run: |
           printf '%s\n' "$SIGNING_KEY" | gpg --batch --import
           KEY=$(gpg --list-secret-keys --with-colons | awk -F: '$1 == "fpr" { print $10; exit }')
-          KEY=$KEY scripts/build.sh "$RUNNER_TEMP/pkgs" site https://cirope.github.io/packages
+          KEY=$KEY scripts/build.sh "$RUNNER_TEMP/pkgs" site https://packages.hullop.com
       - uses: actions/upload-pages-artifact@v5
         with:
           path: site

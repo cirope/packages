@@ -1,9 +1,9 @@
 name: publish
 
-# Rebuilds the apt and dnf repositories from the latest trk release and
-# publishes them on GitHub Pages (https://packages.hullop.com).
-# trk-cli's release workflow starts it, and so does a push to master; it
-# can also be run by hand.
+# Rebuilds the apt and dnf repositories from the latest trk and tlm
+# releases and publishes them on GitHub Pages (https://packages.hullop.com).
+# trk-cli's and tlm-cli's release workflows start it, and so does a push
+# to master; it can also be run by hand.
 
 on:
   repository_dispatch:
@@ -35,12 +35,14 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -qq -y apt-utils createrepo-c rpm
-      - name: Packages from the latest trk release
+      - name: Packages from the latest trk and tlm releases
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release download --repo cirope/trk-cli --dir "$RUNNER_TEMP/pkgs" \
-            --pattern 'trk_linux_*.deb' --pattern 'trk_linux_*.rpm'
+          for product in trk tlm; do
+            gh release download --repo "cirope/$product-cli" --dir "$RUNNER_TEMP/pkgs" \
+              --pattern "${product}_linux_*.deb" --pattern "${product}_linux_*.rpm"
+          done
       - name: Build
         env:
           SIGNING_KEY: ${{ secrets.SIGNING_KEY }}
